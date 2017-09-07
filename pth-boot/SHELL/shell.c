@@ -40,10 +40,14 @@ void ShellLogIn( VTY_STRUCT *vty, char *cmd )
 	{
 		
 		case VTY_STATE_CONNECTED:
-			 
+#if 0	/* skip the user authentication  ,hept, 2017.9.7 */
 			print_string( "username:" );
 			vty->state = VTY_STATE_LOGIN_USERNAME;
-			
+#else
+			vty->state = VTY_STATE_READY;
+			vty->curShellNode = ( void *)&node_Root;
+			PrintLoginMsg();
+#endif
 			break;
 		
 		case VTY_STATE_LOGIN_USERNAME:
