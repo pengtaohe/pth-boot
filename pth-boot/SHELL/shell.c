@@ -47,6 +47,7 @@ void ShellLogIn( VTY_STRUCT *vty, char *cmd )
 			vty->state = VTY_STATE_READY;
 			vty->curShellNode = ( void *)&node_Root;
 			PrintLoginMsg();
+			printf("\r\n%s>", node_Root.nameText );
 #endif
 			break;
 		

@@ -14,14 +14,15 @@
 
 void load_app(u8 type)  /* 1: sram,  2: flash*/
 {
-    u16 oldcount=0;
-    u16 applenth=0;
+    u32 oldcount=0;
+    u32 applenth=0;
 	u8 * p = NULL;
 	u8 i = 0;
 
     printf(" start receive app, please don't typewrite!\r\n");
     uart_interrupt_init(1);
 
+	printf(" received 0x%08X Byte", oldcount);
     while(1)
     {
         if(USART_RX_CNT)
@@ -31,18 +32,21 @@ void load_app(u8 type)  /* 1: sram,  2: flash*/
                 applenth = USART_RX_CNT;
                 oldcount = 0;
                 USART_RX_CNT = 0;
-                printf(" app receive ok!\r\n");
-                printf(" receive %dBytes\r\n",applenth);
                 break;
             }
             else
             {
                 oldcount=USART_RX_CNT;
             }
+			printf("\b\b\b\b\b\b\b\b\b\b\b\b\b");
+			printf("%08X Byte", oldcount);
         }
 
         delay_ms(10);
     }
+
+	printf("\b\b\b\b\b\b\b\b\b\b\b\b\b");
+	printf("%08X Byte\r\n", applenth);
 
     uart_interrupt_init(0);
 
@@ -54,9 +58,9 @@ void load_app(u8 type)  /* 1: sram,  2: flash*/
 			{
 				printf(" received file larger than sram size %dKB.\r\n", SRAM_APP_MAX_LEN/1024);
 			}
-            else if(((*(vu32*)(0X20001000+4))&0xFF000000) == 0x20000000)//判断是否为0X20XXXXXX.
+            else if(((*(vu32*)(USART_RX_BUF+4))&0xFF000000) == 0x20000000)//判断是否为0X20XXXXXX.
             {
-                printf(" write flash app to sram...");
+                printf(" write app to sram...");
 				p = (u8*)0X20001000;
 				for(i = 0; i < applenth; p ++, i ++)
 				{
@@ -71,9 +75,9 @@ void load_app(u8 type)  /* 1: sram,  2: flash*/
         }
         else if(2 == type)
         {
-            if(((*(vu32*)(0X20001000+4))&0xFF000000) == 0x08000000)//判断是否为0X08XXXXXX.
+            if(((*(vu32*)(USART_RX_BUF+4))&0xFF000000) == 0x08000000)//判断是否为0X08XXXXXX.
             {
-                printf(" write flash app to flash...");
+                printf(" write app to flash...");
                 iap_write_appbin(FLASH_APP1_ADDR,USART_RX_BUF,applenth);
                 printf("\b\b\b ok!\r\n");
             }
