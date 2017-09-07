@@ -25,8 +25,13 @@ int fputc(int ch, FILE *f)
 	return ch;
 }
 #endif
-   	
+
+#if 0
 u8 USART_RX_BUF[USART_REC_LEN] __attribute__ ((at(0X20001000)));
+#else
+__align(32) u8 USART_RX_BUF[USART_REC_LEN] __attribute__((at(0X68000000))); /* extern sram space */	
+#endif
+
 u32 USART_RX_CNT=0;
   
 
